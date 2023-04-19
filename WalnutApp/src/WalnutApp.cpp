@@ -40,6 +40,7 @@ static void DrawUI(const char* name, bool& value)
 	ImGui::Checkbox(name, &value);
 }
 
+
 template <typename T>
 static void DrawComponent(const char* name, T& component)
 {
@@ -95,6 +96,12 @@ public:
 		m_Registry.emplace<TransformComponent>(entity);
 		m_Registry.emplace<BoxColliderComponent>(entity);
 		m_Entities.push_back(entity);
+
+		entity = m_Registry.create();
+		m_Registry.emplace<NameComponent>(entity);
+		m_Registry.emplace<TransformComponent>(entity);
+		m_Registry.emplace<BoxColliderComponent>(entity);
+		m_Entities.push_back(entity);
 	}
 
 	virtual void OnUIRender() override
@@ -103,6 +110,8 @@ public:
 		{
 			for (auto entity : m_Entities)
 			{
+				ImGui::Text(std::to_string((std::uint32_t)entity).c_str());
+
 				Utils::For<COMPONENTS::sc_NumClasses>([&](auto i) {
 
 					auto reflClass = COMPONENTS::Get<i.value>();
