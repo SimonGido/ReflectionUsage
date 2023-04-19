@@ -27,6 +27,13 @@ namespace XYZ {
 			result[sc_ClassNames[Index].size()] = 0;						\
 			return result;									\
 		}\
+		template <typename TFunc>\
+		static void ForEach(const TFunc& func)\
+		{\
+			Utils::For<sc_NumClasses>([&](auto i) {\
+				func(i);\
+			});\
+		}\
 	private:\
 		static constexpr std::tuple<Reflection<Args>...> sc_RegisteredClasses = {}; \
 	};\

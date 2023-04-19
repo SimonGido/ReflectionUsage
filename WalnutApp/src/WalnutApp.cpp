@@ -45,7 +45,7 @@ template <typename T>
 static void DrawComponent(const char* name, T& component)
 {
 	ImGui::Text(name);
-	Utils::For<Reflection<T>::sc_NumVariables>([&](auto i) {
+	Reflection<T>::ForEach([&](auto i) {
 		auto variableName = Reflection<T>::GetName<i.value>();
 		auto& variable = Reflection<T>::Get<i.value>(component);
 		DrawUI(variableName.data(), variable);
@@ -57,6 +57,13 @@ struct NameComponent
 	std::string Name;
 };
 REFLECTABLE(NameComponent, Name)
+
+struct TestComponent
+{
+	std::string Name;
+	glm::vec3 Translation, Rotation, Scale;
+};
+REFLECTABLE(TestComponent, Name, Translation, Rotation, Scale)
 
 struct TransformComponent
 {
@@ -80,7 +87,7 @@ REFLECTABLE(BoxColliderComponent, Size, Offset)
 
 
 
-REGISTER_REFLECTABLES(COMPONENTS, NameComponent, TransformComponent, BoxColliderComponent)
+REGISTER_REFLECTABLES(COMPONENTS, NameComponent, TestComponent, TransformComponent, BoxColliderComponent)
 
 class ExampleLayer : public Walnut::Layer
 {
@@ -101,6 +108,7 @@ public:
 		m_Registry.emplace<NameComponent>(entity);
 		m_Registry.emplace<TransformComponent>(entity);
 		m_Registry.emplace<BoxColliderComponent>(entity);
+		m_Registry.emplace<TestComponent>(entity);
 		m_Entities.push_back(entity);
 	}
 
@@ -112,8 +120,7 @@ public:
 			{
 				ImGui::Text(std::to_string((std::uint32_t)entity).c_str());
 
-				Utils::For<COMPONENTS::sc_NumClasses>([&](auto i) {
-
+				COMPONENTS::ForEach([&](auto i) {
 					auto reflClass = COMPONENTS::Get<i.value>();
 					if (HasComponent(entity, reflClass))
 					{
@@ -124,6 +131,7 @@ public:
 						DrawComponent(name, component);
 					}
 				});
+
 			}
 		}
 		ImGui::End();
